@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
+  service-b:
+    build: ./services/service-b
+    container_name: service-b
+    ports:
+      - "8082:8080"
+    restart: unless-stopped
+
+  service-a:
+    build: ./services/service-a
+    container_name: service-a
+    depends_on:
+      - service-b
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
